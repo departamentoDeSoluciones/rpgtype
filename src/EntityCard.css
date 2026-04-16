@@ -1,0 +1,139 @@
+/* 1. Variables de Configuración (Fácil de tunear) */
+:root {
+  --card-bg: #111827;
+  --card-border: #4b5563;
+  --card-hover-bg: #1f2937;
+  --hp-bar-bg: #1f2937;
+  --hp-full: #ffffff;
+  --hp-low: #ef4444;
+  --text-main: #e5e7eb;
+  --text-muted: #6b7280;
+  --transition-speed: 200ms;
+}
+
+/* 2. Contenedor Principal */
+.entity-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 192px; /* 48 en Tailwind */
+  padding: 16px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 2px;
+  color: var(--text-main);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  transition: all var(--transition-speed) ease;
+  user-select: none;
+}
+
+/* Estados del Contenedor */
+.entity-card.is-dead {
+  opacity: 0.4;
+  filter: grayscale(1);
+  border-color: #1f2937;
+}
+
+.entity-card.is-targetable {
+  cursor: pointer;
+}
+
+.entity-card.is-targetable:hover {
+  border-color: #ffffff;
+  background-color: var(--card-hover-bg);
+  transform: translateY(-2px);
+}
+
+/* 3. Cabecera (Nombre y Nivel) */
+.entity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #374151;
+  padding-bottom: 4px;
+}
+
+.entity-name {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.entity-level {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* 4. Estadísticas y HP */
+.entity-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.entity-hp-text.low-hp {
+  color: var(--hp-low);
+  font-weight: bold;
+}
+
+/* 5. Barra de Vida (Health Bar) */
+.health-bar-container {
+  width: 100%;
+  height: 6px;
+  background-color: var(--hp-bar-bg);
+  border-radius: 99px;
+  overflow: hidden;
+  transition: none !important;
+}
+
+.health-bar-fill {
+  height: 100%;
+  transition: none !important;
+  background-color: var(--hp-full);
+}
+
+.health-bar-fill.low-hp-fill {
+  background-color: var(--hp-low);
+  transition: none !important;
+}
+.stamina-bar-fill.low-stamina-fill {
+  background-color: var(--hp-low);
+  transition: none !important;
+}
+.stamina-bar-container {
+ transition: none !important;
+ width: 100%;
+  height: 6px;
+  background-color: var(--hp-bar-bg);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.stamina-bar-fill {
+  height: 100%;
+ transition: none !important;
+  background-color: var(--hp-full);
+}
+
+/* 6. Estados Alterados (Badges) */
+.status-effects-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.status-effect-badge {
+  font-size: 9px;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 1px 4px;
+  border: 1px solid var(--card-border);
+  color: #9ca3af;
+  background: rgba(255, 255, 255, 0.05);
+}

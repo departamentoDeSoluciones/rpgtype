@@ -1,0 +1,147 @@
+import { logger } from "./Logger";
+
+
+function diceRoll(rolls: number, sides: number): number[] {
+  const results: number[] = [];
+  for (let i = 0; i < rolls; i++) {
+    const roll = Math.floor(Math.random() * sides) + 1;
+    results.push(roll);
+  } return results;
+}
+
+interface StatusEffect {
+}
+
+
+
+
+class Stats {
+}
+
+class Armor {
+
+
+}
+
+class ArmorSet {
+
+
+}
+
+
+
+class Experience {
+}
+
+
+export class Player {
+}
+class battleItem {
+
+}
+class Cast {
+
+}
+
+
+class Move {
+
+}
+
+const poisonDart = new battleItem("Dardo Envenenado", (attacker: Player, target?: Player) => {
+  if (!target) return;
+  let damage = 15 + (attacker.currentDex / 2);
+  let roll = diceRoll(3, 6);
+  if (roll[0] === roll[2]) {
+    let damageBonus = roll[0] + roll[1] + roll[2];
+    let finalDamage = damage + damageBonus;
+    logger.log(`Dardo Envenenado usado en ${target.name}`);
+
+    logger.log(`${target.name} tiene suerte, ${damage} mas  ${damageBonus} de daño extra!`);
+    target.receiveDamage(finalDamage);
+  } else {
+
+    logger.log(`Dardo Envenenado usado en ${target.name}`);
+    target.receiveDamage(damage);
+  }
+});
+
+
+const healingPotion = new battleItem("Poción de curación",
+  (user) => {
+    let healAmount = 30;
+    user.receiveHealing(healAmount);
+    logger.log(`${user.name} usó una Poción de curación y recuperó ${healAmount} HP!`);
+  });
+
+
+
+function battle(party: Player[], enemyParty: Player[]) {
+  while (party.some(p => p.isAlive) && enemyParty.some(e => e.isAlive)) {
+    party = party.filter(p => p.isAlive);
+    enemyParty = enemyParty.filter(e => e.isAlive);
+
+    const allCombatants = [...party, ...enemyParty];
+    allCombatants.sort((a, b) => b.stats.dex - a.stats.dex);
+
+    for (const attacker of allCombatants) {
+      if (!attacker.isAlive) continue;
+
+      // 1. Definición de contexto relativo al atacante
+      const isPlayerParty = party.includes(attacker);
+      const allyParty = isPlayerParty ? party : enemyParty;
+      const targetParty = isPlayerParty ? enemyParty : party;
+
+      // 2. Resolución de Inventario
+      if (attacker.inventory.length > 0) {
+        const potion = attacker.inventory.find(item => item.name === "Poción de curación");
+        const poison = attacker.inventory.find(item => item.name === "Dardo Envenenado");
+
+        if (potion && potion.amount > 0) {
+          // Requiere targets específicos
+          const aliveTargets = targetParty.filter(p => p.isAlive);
+          if (aliveTargets.length === 0) continue;
+
+          const target = aliveTargets[Math.floor(Math.random() * aliveTargets.length)];
+          const randomAlly = allyParty[Math.floor(Math.random() * allyParty.length)];
+
+          if (poison && poison.amount > 0) {
+            Math.random() > 0.5 ? poison.use(attacker, target) : potion.use(attacker, randomAlly);
+          } else {
+            potion.use(attacker, randomAlly);
+          }
+          continue; // Termina el turno tras usar objeto
+        }
+      }
+
+
+
+      if (attacker.castSet.length > 0 && Math.random() > 0.5) {
+        attacker.cast(allyParty, targetParty);
+      } else {
+        // ATTACK: Calcula el target individual solo aquí
+        const aliveTargets = targetParty.filter(p => p.isAlive);
+        if (aliveTargets.length === 0) continue;
+        const target = aliveTargets[Math.floor(Math.random() * aliveTargets.length)];
+        attacker.attack(target);
+      }
+
+      party = party.filter(p => p.isAlive);
+      enemyParty = enemyParty.filter(e => e.isAlive);
+    }
+
+    for (const a of allCombatants) {
+      if (a.hp !== 0) { logger.log(`${a.name} | HP: ${a.hp}`); }
+    }
+    logger.log("---- Fin de ronda ----");
+  }
+
+
+
+
+  logger.log(party.some(p => p.isAlive) ? "¡La party ganó!" : "La party enemiga ganó...");
+}
+
+
+logger.log("---- LETS BATTLE  ----");
+battle(party, enemyParty);
