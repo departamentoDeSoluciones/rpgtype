@@ -1,5 +1,12 @@
 import { logger } from './Logger.ts';
 import { Player } from './Model.ts';
+function diceRoll(rolls: number, sides: number): number[] {
+  const results: number[] = [];
+  for (let i = 0; i < rolls; i++) {
+    const roll = Math.floor(Math.random() * sides) + 1;
+    results.push(roll);
+  } return results;
+}
 
 export class BattleEngine {
   private lastTime: number = 0;
@@ -50,23 +57,42 @@ export class BattleEngine {
     const currentTime = performance.now();
     const delta = (currentTime - this.lastTime) / 1000;
     this.lastTime = currentTime;
+
     if (this.actionQueue.length > 0) {
       const attacker = this.actionQueue.shift()!;
 
 
       if (attacker.isAlive) {
+        attacker.updateEffects(delta);
+
         const opps = attacker.team ?
           this.allEntities.filter(e => !e.team && e.isAlive) :
           this.allEntities.filter(e => e.team && e.isAlive);
+        const teammate = attacker.team ?
+          this.allEntities.filter(e => e.team && e.isAlive) :
+          this.allEntities.filter(e => !e.team && e.isAlive);
 
         if (opps.length > 0) {
-          attacker.attack(opps[0]);
+
+          if (attacker.castSet && attacker.castSet.length > 0 && teammate.length > 0) {
+            let rolls = diceRoll(1, 2);
+            if (rolls[0] === 1) {
+              attacker.cast(teammate[0], opps[0]);
+            } else {
+              attacker.attack(opps[0]);
+            }
+          } else {
+
+            attacker.attack(opps[0]);
+          }
+
         }
+
       }
-      attacker.atb.reset();
     }
     this.allEntities.forEach(player => {
-      if (player.isAlive && player.atb.status === 'idle') {
+      if (player.isAlive) {
+        player.updateEffects(delta);
         player.updateAtb(delta);
       }
       if (player.atb.status === 'ready' && !this.actionQueue.includes(player)) {
@@ -77,3 +103,4 @@ export class BattleEngine {
     requestAnimationFrame(this.loop);
   }
 }
+

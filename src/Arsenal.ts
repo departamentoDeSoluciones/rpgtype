@@ -1,6 +1,5 @@
 import { logger } from "./Logger";
-import type { Player, StatusEffect } from './Model';
-// Valores reales: Esto sí se mantiene porque haces "new Move()", "new ArmorSet()", etc.
+import { Player, StatusEffect } from './Model';
 import { Move, Cast, BattleItem, Armor, ArmorSet } from './Model';
 
 function diceRoll(rolls: number, sides: number): number[] {
@@ -10,26 +9,58 @@ function diceRoll(rolls: number, sides: number): number[] {
     results.push(roll);
   } return results;
 }
+export class Bash extends StatusEffect {
+  constructor(duration: number = .2) {
+    super("Aturdimiento", duration);
+  }
+  onDexMod(currentValue: number): number {
+    return 0;
+  }
+}
 
-export class ZenEffect implements StatusEffect {
-  constructor(public name = " Modo Zen ", public duration: number = 3) { }
-  onIntMod(currentValue: number): number {
+export class ZenEffect extends StatusEffect {
+  constructor(duration: number = 4) {
+    super("Zen Mode", duration);
     logger.log(`MODO ZEN INTELIGENCIA DOBLE!`);
+  }
+  onIntMod(currentValue: number): number {
     return currentValue * 2;
+  }
+}
+export class winded extends StatusEffect {
+  constructor(duration: number = 4) {
+    super("Winded", duration);
+    logger.log(`Corres con el viento`);
+  }
+  onDexMod(currentValue: number): number {
+    return currentValue * 1.5;
+  }
+}
+
+export class cemetaryCurse extends StatusEffect {
+  constructor(duration: number = 4) {
+    super("Cemetary Curse", duration);
+    logger.log(`Los cadaveres del cementerio te relentizan!`);
+
+  }
+  onDexMod(currentValue: number): number {
+    return currentValue * 0.75;
   }
 }
 
 export const none = new Armor("none", 0, 1);
 export const helmet = new Armor("Casco de hierro", 5, 100);
 export const chest = new Armor("Pechera de acero", 15, 200);
-export const boots = new Armor("Botas de cuero", 5, 80);
+export const boots = new Armor("Botas de cuero", 10, 80);
 export const titaniumrobe = new Armor("Titanium Robe", 40, 100);
 export const dedalousheather = new Armor("Dedalous Heather", 25, 150);
 export const leaf = new Armor("Leaf Armor", 1, 1);
 export const holyHelmet = new Armor("Holy Helmet", 35, 120);
 export const penacho = new Armor("Penacho", 20, 100);
+export const blackDrug = new Armor("Black Drug", 55, 150);
 
 export const armorSetDarkCleric = new ArmorSet(holyHelmet, chest, boots);
+export const armorSetVS = new ArmorSet(helmet, blackDrug, boots);
 export const armorSetBasic = new ArmorSet(helmet, chest, boots);
 export const armorSetNecro = new ArmorSet(none, titaniumrobe, boots);
 export const armorSetBelafonte = new ArmorSet(helmet, dedalousheather, none);
@@ -63,68 +94,112 @@ export function createHealingPotion() {
 }
 
 export const hellPray = new Cast("Oración al Infierno", (allies, enemies) => {
-  const targets = allies.length > 0 ? allies : enemies;
-  const livingTargets = targets.filter(t => t.isAlive);
-
-  if (livingTargets.length === 0) return; // Nadie a quien rezar
-
-  const ally = livingTargets[Math.floor(Math.random() * livingTargets.length)];
-
-  const baseHeal = 20 + (ally.currentInt / 2);
-  const roll = diceRoll(2, 28);
+  const baseHeal = 20 + (allies.currentInt / 2);
+  const roll = diceRoll(2, 1);
   const totalRoll = roll.reduce((acc, val) => acc + val, 0);
-
-  if (roll[0] === 7 || roll[1] === 1) {
-    logger.log(`${ally.name} fue maldecido por el infierno!`);
-    ally.statusEffects.push(new ZenEffect());
-    const sacrificeDamage = 15;
-    ally.receiveDamage(sacrificeDamage);
+  if (roll[1] === 1) {
+    logger.log(`${allies.name} fue maldecido por el infierno!`);
+    allies.statusEffects.push(new ZenEffect);
+    const sacrificeDamage = allies.hp * 0.1;
+    allies.receiveDamage(sacrificeDamage);
   } else {
-    ally.receiveHealing(baseHeal + totalRoll);
+    allies.receiveHealing(baseHeal + totalRoll);
   }
+});
+
+export const sacretChilds = new Cast("Hijos Sagrados", (allies, enemies) => {
+  let baseHeal = Math.floor(allies.currentInt / 2);
+  let roll = diceRoll(4, 28);
+  if (roll[0] === roll[1] || roll[2] === roll[3]) {
+    logger.log(`Los hijos sagrados afilan tu vision ${allies.name} `);
+    let finalHeal = baseHeal + roll[0] + roll[1] + roll[2] + roll[3];
+    allies.receiveHealing(finalHeal);
+  } else {
+    allies.receiveHealing(baseHeal);
+  }
+});
+export const desolatorWine = new Cast("Vino Desolador", (allies, enemies) => {
+  let baseheal = 150;
+  let roll = diceRoll(2, 20);
+  if (roll[0] === 1 || roll[1] === 1) {
+    logger.log(`${allies.name} se emborracha y recibe daño!`);
+    allies.receiveDamage(baseheal / 1.5);
+    return;
+  }
+  if (roll[0] === 20 || roll[1] === 20) {
+    let healBonus = (allies.currentInt / 2);
+    logger.log(`${allies.name} se emborracha y se siente genial! Recibe curación extra!`);
+    allies.receiveHealing(baseheal + healBonus);
+  } else {
+    allies.receiveHealing(baseheal);
+  }
+});
+
+export const funeralopolis = new Cast("Funeralópolis", (allies, enemies) => {
+
+  let roll = diceRoll(3, 6);
+  let baseDamage = 30 + (allies.currentStr / 100);
+  if (roll[0] === 6 || roll[1] === 6 || roll[2] === 6) {
+    logger.log(`Millions are screaming, the dead are still living`);
+    enemies.statusEffects.push(new cemetaryCurse);
+
+  }
+
+  logger.log(`Death shroud existence, slave for a pittance`);
+  enemies.receiveDamage(baseDamage);
 });
 
 export const copalWaves = new Move("Ondas de Copal", (attacker: Player, target: Player) => {
   let baseDamage = Math.floor(attacker.currentDex / 3.3);
   let roll = diceRoll(2, 20);
   let finaldamage = baseDamage + roll[0] * roll[1];
-  if (roll[0] === 7 && roll[1] === 14) {
+  if (roll[0] === 7 || roll[1] === 14) {
     logger.log(`Espiritus bendicen a ${attacker.name}`);
-    attacker.statusEffects.push(new ZenEffect());
+    attacker.statusEffects.push(new ZenEffect);
   }
   target.receiveDamage(finaldamage);
-});
+}, .01);
 export const quickArrow = new Move("Flecha Rápida", (attacker: Player, target) => {
   let roll = diceRoll(3, 6);
   let baseDamage = attacker.currentDex / 6;
   let finaldamage = (baseDamage + roll[0]) + (baseDamage + roll[1] - (roll[2] + 9));
-  let finaldamage2 = (baseDamage + roll[2] + 9);
+  let finaldamage2 = (baseDamage + roll[2] + roll[0] + roll[1]);
+  if (roll[0] === roll[1] || roll[1] === roll[2]) {
+    attacker.statusEffects.push(new winded);
+  }
   target.receiveDamage(finaldamage);
+  if (!target.isAlive) { return; }
   target.receiveDamage(finaldamage2);
-  target.receiveDamage(roll[2]);
 
-});
+}, .02);
+
 export const darkPulse = new Move("Pulso Sombrio", (attacker, target) => {
   let baseDamage = Math.floor(attacker.currentInt / 2);
   let intDifference = attacker.currentInt - target.currentInt;
   let bonusDamage = intDifference > 0 ? Math.floor(intDifference * (attacker.currentInt / 100)) : 0;
 
   target.receiveDamage(baseDamage + bonusDamage);
-});
+}, 5);
 
 export const punch = new Move("Puñetazo", (attacker, target) => {
-  let damage = 10 + (attacker.stats.strength / 2);
+  let damage = 50 + (attacker.currentStr / 2);
+  let roll = diceRoll(2, 20);
+  if (roll[0] === 1 || roll[1] === 20) {
+    logger.log(`${attacker.name} aturde a ${target.name} con un golpe!`);
+    target.atb.actingTime += .2;
+    target.atb.status = 'acting';
+  }
   target.receiveDamage(damage);
-});
+}, .5);
 
 export const soulMisil = new Move("misil de almas", (attacker, target) => {
   let damage = 20 + (attacker.currentStr / .85);
   target.receiveDamage(damage);
-})
+}, .2)
 
 export const doubleStrike = new Move("Golpe Doble", (attacker, target) => {
   const roll = diceRoll(2, 20);
-  let damage = (attacker.currentStr);
+  let damage = attacker.currentStr * .5;
   if (roll[0] + roll[1] === 5) {
     damage *= 1.25;
   }
@@ -133,7 +208,7 @@ export const doubleStrike = new Move("Golpe Doble", (attacker, target) => {
   target.receiveDamage(damage);
   if (!target.isAlive) { return; }
   target.receiveDamage(damage2);
-});
+}, 1);
 
 
 
@@ -146,17 +221,18 @@ export const fireball = new Move("Bola de Fuego", (attacker, target) => {
     logger.log(`${target.name} se quema y recibe daño extra!`);
     target.receiveDamage(attacker.stats.int / 5.55);
   }
-});
+}, .1);
 
 
 export const thunderArrow = new Move("Flecha de Trueno", (attacker, target) => {
   let damage = attacker.stats.dex * .75;
   let roll = diceRoll(2, 20);
-  let thunderDamage = (roll[0] + roll[1]) / 2;
+  let thunderDamage = (roll[0] + roll[1] + (attacker.currentDex / 10));
+  thunderDamage = Math.floor(thunderDamage);
   let finaldamage: number = damage + thunderDamage;
-  logger.log(`${target.name} es golpeado por un trueno que inflige ${thunderDamage} de daño!`);
+  logger.log(`${target.name} es golpeado por un trueno que inflige ${thunderDamage} de daño extra!`);
   target.receiveDamage(finaldamage);
-});
+}, .4);
 
 export const healingVine = new Move("Vid Curativa", (attacker, target) => {
   let baseDamage = attacker.currentStr * 0.5;
@@ -168,13 +244,12 @@ export const healingVine = new Move("Vid Curativa", (attacker, target) => {
   logger.log(`lianas espinosas curan a ${attacker.name}`);
   attacker.receiveHealing(healAmount);
   return 0;
-});
+}, .5);
 healingVine.isSupport = true;
 
 
 export const entangle = new Move("Enredadera", (attacker, target) => {
-  logger.log(` las hojas de ${attacker.name} se mueven con el viento`);
-  attacker.receiveHealing(1);
-});
+  logger.log(` las hojas de ${attacker.name} reflejan la luz del dia`);
+}, 0.1);
 
 

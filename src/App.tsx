@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { LoggerScreen } from './LoggerScreen';
-import { party, enemyParty } from './Entities';
+import { party, enemyParty, enemyMob } from './Entities';
 import { EntityCard } from './EntityCard';
 import { BattleEngine } from './BattleEngine';
 
 
 
 
-const battlengine: BattleEngine = new BattleEngine(party, enemyParty);
+const battlengine: BattleEngine = new BattleEngine(party, enemyMob);
 
 export default function App() {
 
   const allies = party.filter(p => p.team === true);
-  const enemies = enemyParty.filter(p => p.team === false);
+  const enemies = enemyMob.filter(p => p.team === false);
   useEffect(() => {
 
     battlengine.start();

@@ -80,7 +80,81 @@
   color: var(--hp-low);
   font-weight: bold;
 }
+.entity-moves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+  border-top: 1px dashed #374151; /* Separador sutil */
+  padding-top: 12px;
+}
+/* Soporte para el Modificador de Stats */
+.stat-value-container {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
 
+.stat-mod {
+  font-size: 10px;
+  font-weight: normal;
+  opacity: 0.65; /* Color más tenue */
+}
+
+.stat-mod-pos {
+  color: #10b981; /* Verde cibernético sutil para Buffs */
+}
+
+.stat-mod-neg {
+  color: var(--hp-low); /* Rojo para Debuffs */
+}
+.move-badge {
+  font-family: 'Helvetica', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 3px 6px;
+  border: 1px solid var(--card-border);
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.03); /* Ruido/Grain sutil */
+  color: var(--text-muted);
+}
+/* 8. Atributos Principales (Stats Grid) */
+.entity-main-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid #374151;
+  border-radius: 2px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+}
+
+.stat-label {
+  color: var(--text-muted);
+  font-weight: bold;
+}
+
+.stat-value {
+  color: var(--text-main);
+}
+/* Indicadores de tipo de daño */
+.move-physical {
+  border-left: 2px solid var(--hp-low); /* Rojo para físico */
+}
+
+.move-magical {
+  border-left: 2px solid #3b82f6; /* Azul para mágico/cast */
+}
 /* 5. Barra de Vida (Health Bar) */
 .health-bar-container {
   width: 100%;
@@ -90,7 +164,19 @@
   overflow: hidden;
   transition: none !important;
 }
-
+.acting-bar-container {
+  width: 100%;
+  height: 6px;
+  background-color: var(--hp-bar-bg);
+  border-radius: 99px;
+  overflow: hidden;
+  transition: none !important;
+}
+.acting-bar-fill {
+  height: 100%;
+  transition: none !important;
+  background-color: var(--hp-full);
+}
 .health-bar-fill {
   height: 100%;
   transition: none !important;
