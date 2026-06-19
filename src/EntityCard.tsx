@@ -6,9 +6,10 @@ import { logger } from './Logger';
 interface EntityCardProps {
   player: Player;
 }
+
 export const EntityCard: React.FC<EntityCardProps> = ({ player }) => {
   const [, setTick] = useState(0);
-
+  const [selectedTarget, setSelectedTarget] = useState<Player>();
   useEffect(() => {
     const unsubscribe = player.subscribe(() => setTick(t => t + 1));
     return () => unsubscribe();
@@ -16,6 +17,7 @@ export const EntityCard: React.FC<EntityCardProps> = ({ player }) => {
 
   const onSelect = (target: Player) => {
     logger.log(`${target.name} seleccionado`);
+    setSelectedTarget(target);
   };
 
   const isTargetable: boolean = true;
@@ -25,6 +27,15 @@ export const EntityCard: React.FC<EntityCardProps> = ({ player }) => {
   const staminaPercentage = Math.max(0, (player.atb.atb / 200) * 100);
   const isLowStamina = staminaPercentage > 25;
   const actingPercentage = Math.max(0, (player.atb.actingTime / 1) * 100);
+
+  const handleAttack = (deffender?: Player) => {
+
+    if (!deffender || !player.isAlive || player.atb.status !== 'ready') {
+      return;
+    }
+    player.attack(deffender);
+  };
+
 
 
   const handleClick = () => {
@@ -95,7 +106,9 @@ export const EntityCard: React.FC<EntityCardProps> = ({ player }) => {
       <div className="entity-moves">
         {player.moveSet.map((move) => (
           <span key={move.name} className="move-badge move-physical">
-            {move.name}
+            <button onClick={() => handleAttack(selectedTarget)}>
+              {move.name}
+            </button>
           </span>
         ))}
         {player.castSet.map((cast) => (

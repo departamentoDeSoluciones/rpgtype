@@ -7,12 +7,12 @@ import { BattleEngine } from './BattleEngine';
 
 
 
-const battlengine: BattleEngine = new BattleEngine(party, enemyMob);
+const battlengine: BattleEngine = new BattleEngine(party, enemyParty);
 
 export default function App() {
 
-  const allies = party.filter(p => p.team === true);
-  const enemies = enemyMob.filter(p => p.team === false);
+  const allies = battlengine.allies;
+  const enemies = battlengine.enemies;
   useEffect(() => {
 
     battlengine.start();
@@ -27,14 +27,12 @@ export default function App() {
     <div className="battle-container">
       <LoggerScreen />
       <div style={{ marginBottom: '4px', display: 'flex', justifyContent: 'spaceEvenly', width: '100%' }}>
-        {/* Columna de Enemigos */}
         <div className="enemy-side">
           {enemies.map((enemy) => (
             <EntityCard key={enemy.name} player={enemy} />
           ))}
         </div>
 
-        {/* Columna de Aliados */}
         <div className="ally-side">
           {allies.map((ally) => (
             <EntityCard key={ally.name} player={ally} />

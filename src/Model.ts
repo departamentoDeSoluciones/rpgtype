@@ -40,8 +40,6 @@ export class Stats {
     public strength: number
   ) { }
 
-  statsEffect(intMod: number, dexMod: number, strMod: number) {
-  }
 
   statsLevelUp(totalLevels: number) {
     const growthRate = 5 * totalLevels;

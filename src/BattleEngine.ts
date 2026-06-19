@@ -32,6 +32,14 @@ export class BattleEngine {
     this.lastTime = performance.now();
     this.loop();
   }
+  public get allies(): Player[] {
+    return this.allEntities.filter(p => p.team === true);
+  }
+
+  public get enemies(): Player[] {
+    return this.allEntities.filter(p => p.team === false);
+  }
+
   private checkGameOver() {
     const alliesAlive = this.allEntities.filter(p => p.team && p.isAlive);
     const enemiesAlive = this.allEntities.filter(p => !p.team && p.isAlive);
@@ -50,6 +58,14 @@ export class BattleEngine {
 
     return null;
   }
+
+  private turns: boolean = (attacker: Player, defender: Player) => {
+
+    const checarQueue = () => {
+      if (this.actionQueue[0].coin)
+    }
+  };
+
   private loop = () => {
     if (!this.isRuning) return;
     if (this.checkGameOver()) return;
@@ -71,22 +87,6 @@ export class BattleEngine {
         const teammate = attacker.team ?
           this.allEntities.filter(e => e.team && e.isAlive) :
           this.allEntities.filter(e => !e.team && e.isAlive);
-
-        if (opps.length > 0) {
-
-          if (attacker.castSet && attacker.castSet.length > 0 && teammate.length > 0) {
-            let rolls = diceRoll(1, 2);
-            if (rolls[0] === 1) {
-              attacker.cast(teammate[0], opps[0]);
-            } else {
-              attacker.attack(opps[0]);
-            }
-          } else {
-
-            attacker.attack(opps[0]);
-          }
-
-        }
 
       }
     }
