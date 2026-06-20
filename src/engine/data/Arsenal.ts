@@ -1,6 +1,7 @@
-import { logger } from "./Logger";
-import { Player, StatusEffect } from './Model';
-import { Move, Cast, BattleItem, Armor, ArmorSet } from './Model';
+import { logger } from "../core/Logger";
+import { Player } from '../models/Player';
+import { StatusEffect } from "../models/Stats";
+import { Move, Cast, BattleItem, Armor, ArmorSet } from '../models/BattleActions';
 
 function diceRoll(rolls: number, sides: number): number[] {
   const results: number[] = [];

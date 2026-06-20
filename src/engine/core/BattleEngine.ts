@@ -1,5 +1,5 @@
 import { logger } from './Logger.ts';
-import { Player } from './Model.ts';
+import { Player } from '../models/Player';
 function diceRoll(rolls: number, sides: number): number[] {
   const results: number[] = [];
   for (let i = 0; i < rolls; i++) {
@@ -59,12 +59,7 @@ export class BattleEngine {
     return null;
   }
 
-  private turns: boolean = (attacker: Player, defender: Player) => {
 
-    const checarQueue = () => {
-      if (this.actionQueue[0].coin)
-    }
-  };
 
   private loop = () => {
     if (!this.isRuning) return;

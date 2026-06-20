@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { logger } from './Logger';
+import { logger } from '../../engine/core/Logger';
 
 export const LoggerScreen = () => {
   const [logs, setLogs] = useState<string[]>([]);

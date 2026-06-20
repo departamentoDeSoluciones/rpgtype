@@ -1,4 +1,5 @@
-import { Player, Stats, Mob } from './Model';
+import { Player, Mob } from '../models/Player.ts';
+import { Stats } from '../models/Stats'
 import {
   armorSetDarkCleric,
   armorSetBasic,

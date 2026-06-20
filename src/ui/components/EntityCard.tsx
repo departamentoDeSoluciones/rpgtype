@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Player } from './Model';
+import { Player } from '../../engine/models/Player';
 import './EntityCard.css';
-import { logger } from './Logger';
+import { logger } from '../../engine/core/Logger';
 
 interface EntityCardProps {
   player: Player;

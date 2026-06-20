@@ -1,10 +1,8 @@
 import { useEffect } from 'react';
-import { LoggerScreen } from './LoggerScreen';
-import { party, enemyParty, enemyMob } from './Entities';
-import { EntityCard } from './EntityCard';
-import { BattleEngine } from './BattleEngine';
-
-
+import { LoggerScreen } from './ui/components/LoggerScreen'
+import { party, enemyParty, enemyMob } from './engine/data/Entities.ts';
+import { EntityCard } from './ui/components/EntityCard';
+import { BattleEngine } from './engine/core/BattleEngine';
 
 
 const battlengine: BattleEngine = new BattleEngine(party, enemyParty);
